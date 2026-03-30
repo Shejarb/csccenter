@@ -127,3 +127,7 @@ app.get("/stats", (req, res) => {
     res.json(result[0]);
   });
 });
+
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
+});

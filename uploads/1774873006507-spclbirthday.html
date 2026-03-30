@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday Alisha!</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: linear-gradient(to top, #87ceeb, #ffffff);
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Balloons */
+    .balloon {
+      width: 40px;
+      height: 60px;
+      background-color: #ff6b6b;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      position: absolute;
+      bottom: -100px;
+      animation: float 10s linear infinite;
+    }
+
+    .balloon::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      width: 2px;
+      height: 30px;
+      background: #333;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-110vh) rotate(360deg);
+      }
+    }
+
+    /* Letter */
+    .letter {
+      width: 300px;
+      height: auto;
+      background: white;
+      border: 2px solid #ff69b4;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      position: absolute;
+      top: -300px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 20px;
+      text-align: center;
+      font-size: 1.2em;
+      border-radius: 10px;
+      opacity: 0;
+      transition: all 1s ease;
+      z-index: 10;
+    }
+
+    .letter.show {
+      top: 150px;
+      opacity: 1;
+    }
+
+    .letter h2 {
+      margin-top: 0;
+      color: #e91e63;
+    }
+
+    .letter p {
+      font-size: 1em;
+      color: #555;
+    }
+
+    #downloadBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #e91e63;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio -->
+  <audio autoplay loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-buddy.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Letter -->
+  <div class="letter" id="letter">
+    <h2>🎉 Happy Birthday, Alisha! 🎂</h2>
+    <p>Wishing you a day filled with love, joy, and laughter.<br>Have a fantastic year ahead! 💖</p>
+    <button id="downloadBtn">📄 Download Birthday Card</button>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    // Create Balloons
+    for (let i = 0; i < 15; i++) {
+      const balloon = document.createElement('div');
+      balloon.className = 'balloon';
+      balloon.style.left = Math.random() * 100 + 'vw';
+      balloon.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+      balloon.style.animationDuration = (5 + Math.random() * 5) + 's';
+      document.body.appendChild(balloon);
+    }
+
+    // Show Letter
+    window.onload = () => {
+      setTimeout(() => {
+        document.getElementById('letter').classList.add('show');
+        startConfetti();
+      }, 5000);
+    };
+
+    // Download Card
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      html2canvas(document.getElementById('letter')).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Happy_Birthday_Alisha.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    });
+
+    // Confetti Animation
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let confetti = [];
+
+    function startConfetti() {
+      for (let i = 0; i < 150; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 10 + 10,
+          color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+          tilt: Math.random() * 10 - 10,
+          tiltAngle: 0,
+        });
+      }
+
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(c => {
+        ctx.beginPath();
+        ctx.fillStyle = c.color;
+        ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+        ctx.fill();
+        c.y += Math.cos(c.d / 10) + 1;
+        c.x += Math.sin(c.d / 10);
+        if (c.y > canvas.height) {
+          c.y = -10;
+          c.x = Math.random() * canvas.width;
+        }
+      });
+      requestAnimationFrame(animateConfetti);
+    }
+  </script>
+</body>
+</html>
