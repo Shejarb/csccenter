@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <style>
+    body { font-family: Arial; background:#f4f6f9; padding:20px; }
+    h1 { color:#ff7a59; }
+
+    .top {
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+    }
+
+    .card {
+      background:white;
+      padding:20px;
+      margin:10px 0;
+      border-radius:10px;
+      font-size:20px;
+    }
+
+    table {
+      width:100%;
+      border-collapse: collapse;
+      background:white;
+    }
+
+    th, td {
+      padding:10px;
+      border:1px solid #ddd;
+      text-align:center;
+    }
+
+    th {
+      background:#ff7a59;
+      color:white;
+    }
+
+    input {
+      padding:8px;
+      margin:10px 0;
+      width:200px;
+    }
+
+    button {
+      padding:6px 10px;
+      border:none;
+      cursor:pointer;
+    }
+
+    .logout { background:black; color:white; }
+    .delete { background:red; color:white; }
+    .download { background:green; color:white; padding:5px; }
+  </style>
+</head>
+<body>
+
+<div class="top">
+  <h1>📊 Admin Dashboard</h1>
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<div class="card">
+  Total Requests: <span id="total">0</span>
+</div>
+
+<input type="text" id="search" placeholder="Search..." onkeyup="filterData()">
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Phone</th>
+      <th>Message</th>
+      <th>File</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="data"></tbody>
+</table>
+
+<script>
+if(localStorage.getItem("auth") !== "true") {
+  window.location.href = "login.html";
+}
+
+/* Load Stats */
+fetch("/stats")
+.then(res=>res.json())
+.then(data=>{
+  document.getElementById("total").innerText = data.total;
+});
+
+/* Load Data */
+let fullData = [];
+
+function loadData() {
+  fetch("/contacts")
+  .then(res=>res.json())
+  .then(data=>{
+    fullData = data;
+    displayData(data);
+  });
+}
+
+function displayData(data) {
+  let html = "";
+  data.forEach(item=>{
+    html += `
+      <tr>
+        <td>${item.id}</td>
+        <td>${item.name}</td>
+        <td>${item.phone}</td>
+        <td>${item.message}</td>
+        <td>
+          ${item.file ? `<a class="download" href="/uploads/${item.file}" target="_blank">Download</a>` : 'No File'}
+        </td>
+        <td>
+          <button class="delete" onclick="deleteData(${item.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+  document.getElementById("data").innerHTML = html;
+}
+
+/* Search */
+function filterData() {
+  let value = search.value.toLowerCase();
+  let filtered = fullData.filter(d =>
+    d.name.toLowerCase().includes(value) ||
+    d.phone.includes(value)
+  );
+  displayData(filtered);
+}
+
+/* Delete */
+function deleteData(id) {
+  if(confirm("Delete?")) {
+    fetch("/delete/" + id, { method: "DELETE" })
+    .then(()=>{
+      loadData();
+    });
+  }
+}
+
+/* Logout */
+function logout() {
+  localStorage.removeItem("auth");
+  window.location.href = "login.html";
+}
+
+loadData();
+</script>
+
+</body>
+</html>

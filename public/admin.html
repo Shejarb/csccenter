@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CSC Admin Panel</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background:#f4f6f9; }
+    h1 { color: #ff7a59; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #ff7a59;
+      color: white;
+    }
+    button {
+      padding: 5px 10px;
+      border: none;
+      background: red;
+      color: white;
+      cursor: pointer;
+    }
+    .download {
+      background: green;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📊 CSC Admin Dashboard</h1>
+
+<button onclick="loadData()">Load Data</button>
+
+<br><br>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Phone</th>
+      <th>Message</th>
+      <th>File</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="data"></tbody>
+</table>
+
+<script>
+function loadData() {
+  fetch("/contacts")
+  .then(res => res.json())
+  .then(data => {
+    let html = "";
+
+    data.forEach(item => {
+      html += `
+        <tr>
+          <td>${item.id}</td>
+          <td>${item.name}</td>
+          <td>${item.phone}</td>
+          <td>${item.message}</td>
+          <td>
+            ${item.file ? `<a class="download" href="/uploads/${item.file}" target="_blank">Download</a>` : 'No File'}
+          </td>
+          <td>
+            <button onclick="deleteData(${item.id})">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
+
+    document.getElementById("data").innerHTML = html;
+  });
+}
+
+function deleteData(id) {
+  if(confirm("Delete this record?")) {
+    fetch("/delete/" + id, { method: "DELETE" })
+    .then(() => {
+      alert("Deleted");
+      loadData();
+    });
+  }
+}
+</script>
+
+</body>
+</html>
