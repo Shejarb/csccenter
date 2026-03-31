@@ -1,17 +1,18 @@
 const mysql = require("mysql");
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "csc_center"
+  host: "your-host",
+  user: "your-user",
+  password: "your-password",
+  database: "your-db",
+  port: 3306
 });
 
 db.connect(err => {
   if (err) {
-    console.log("⚠️ Database not connected (online deploy)");
+    console.log("DB Error:", err.message);
   } else {
-    console.log("MySQL Connected");
+    console.log("Database Connected ✅");
   }
 });
 
