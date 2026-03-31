@@ -87,7 +87,10 @@ app.listen(PORT, () => {
 /* GET ALL CONTACTS */
 app.get("/contacts", (req, res) => {
   db.query("SELECT * FROM contacts ORDER BY id DESC", (err, result) => {
-    if (err) throw err;
+    if (err) {
+  console.log("DB Error:", err.message);
+  return;
+}
     res.json(result);
   });
 });
